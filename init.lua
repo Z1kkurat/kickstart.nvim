@@ -1100,14 +1100,14 @@ require('lualine').setup {
     lualine_x = {
       { 'g:metals_status' },
       {
-        function() return require("noice").api.status.command.get() end,
-        cond = function() return package.loaded["noice"] and require("noice").api.status.command.has() end,
+        function() return require("noice").api.status.command.get end,
+        cond = function() return package.loaded["noice"] and require("noice").api.status.command.has end,
         color = fg("Statement"),
       },
       -- stylua: ignore
       {
-        function() return require("noice").api.status.mode.get() end,
-        cond = function() return package.loaded["noice"] and require("noice").api.status.mode.has() end,
+        function() return require("noice").api.status.mode.get end,
+        cond = function() return package.loaded["noice"] and require("noice").api.status.mode.has end,
         color = fg("Constant"),
       },
       -- stylua: ignore
