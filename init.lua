@@ -65,60 +65,7 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 -- Courtesy of lazyvim
-local icons = {
-  diagnostics = {
-    Error = " ",
-    Warn  = " ",
-    Hint  = " ",
-    Info  = " ",
-  },
-  git = {
-    added    = " ",
-    modified = " ",
-    removed  = " ",
-  },
-  kinds = {
-    Array         = " ",
-    Boolean       = "󰨙 ",
-    Class         = " ",
-    Codeium       = "󰘦 ",
-    Color         = " ",
-    Control       = " ",
-    Collapsed     = " ",
-    Constant      = "󰏿 ",
-    Constructor   = " ",
-    Copilot       = " ",
-    Enum          = " ",
-    EnumMember    = " ",
-    Event         = " ",
-    Field         = " ",
-    File          = " ",
-    Folder        = " ",
-    Function      = "󰊕 ",
-    Interface     = " ",
-    Key           = " ",
-    Keyword       = " ",
-    Method        = "󰊕 ",
-    Module        = " ",
-    Namespace     = "󰦮 ",
-    Null          = " ",
-    Number        = "󰎠 ",
-    Object        = " ",
-    Operator      = " ",
-    Package       = " ",
-    Property      = " ",
-    Reference     = " ",
-    Snippet       = " ",
-    String        = " ",
-    Struct        = "󰆼 ",
-    TabNine       = "󰏚 ",
-    Text          = " ",
-    TypeParameter = " ",
-    Unit          = " ",
-    Value         = " ",
-    Variable      = "󰀫 ",
-  },
-}
+local icons = require("util").defaults.icons
 
 -- [[ Configure plugins ]]
 -- NOTE: Here is where you install your plugins.
@@ -132,6 +79,13 @@ require('lazy').setup({
   -- Git related plugins
   'tpope/vim-fugitive',
   'tpope/vim-rhubarb',
+  {
+    'sindrets/diffview.nvim',
+    keys = {
+      { "<leader>gd", "<Cmd>DiffviewOpen<CR>",  desc = "Open [G]it [d]iff" },
+      { "<leader>gc", "<Cmd>DiffviewClose<CR>", desc = "[g]it diff [c]lose" }
+    }
+  },
 
   -- Detect tabstop and shiftwidth automatically
   'tpope/vim-sleuth',
@@ -526,33 +480,7 @@ require('lazy').setup({
         end
       end
     end,
-    opts = {
-      sources = { "filesystem", "buffers", "git_status", "document_symbols" },
-      open_files_do_not_replace_types = { "terminal", "Trouble", "trouble", "qf", "Outline" },
-      filesystem = {
-        bind_to_cwd = false,
-        follow_current_file = { enabled = true },
-        use_libuv_file_watcher = true,
-      },
-      window = {
-        mappings = {
-          ["<space>"] = "none",
-          ["Y"] = function(state)
-            local node = state.tree:get_node()
-            local path = node:get_id()
-            vim.fn.setreg("+", path, "c")
-          end,
-        },
-      },
-      default_component_configs = {
-        indent = {
-          with_expanders = true, -- if nil and file nesting is enabled, will enable expanders
-          expander_collapsed = "",
-          expander_expanded = "",
-          expander_highlight = "NeoTreeExpander",
-        },
-      },
-    },
+    opts = {},
     config = function()
       vim.fn.sign_define("DiagnosticSignError",
         { text = icons.diagnostics.Error, texthl = "DiagnosticSignError" })
@@ -562,6 +490,33 @@ require('lazy').setup({
         { text = icons.diagnostics.Info, texthl = "DiagnosticSignInfo" })
       vim.fn.sign_define("DiagnosticSignHint",
         { text = icons.diagnostics.Hint, texthl = "DiagnosticSignHint" })
+      require("neo-tree").setup({
+        sources = { "filesystem", "buffers", "git_status", "document_symbols" },
+        open_files_do_not_replace_types = { "terminal", "Trouble", "trouble", "qf", "Outline" },
+        filesystem = {
+          bind_to_cwd = false,
+          follow_current_file = { enabled = true },
+          use_libuv_file_watcher = true,
+        },
+        window = {
+          mappings = {
+            ["<space>"] = "none",
+            ["Y"] = function(state)
+              local node = state.tree:get_node()
+              local path = node:get_id()
+              vim.fn.setreg("+", path, "c")
+            end,
+          },
+        },
+        default_component_configs = {
+          indent = {
+            with_expanders = true, -- if nil and file nesting is enabled, will enable expanders
+            expander_collapsed = "",
+            expander_expanded = "",
+            expander_highlight = "NeoTreeExpander",
+          },
+        },
+      })
     end,
   },
 
@@ -1074,6 +1029,30 @@ local function fg(name)
   return foreground and { fg = string.format("#%06x", foreground) } or nil
 end
 
+local colors = {
+  [""] = fg("Special"),
+  ["Normal"] = fg("Special"),
+  ["Warning"] = fg("DiagnosticError"),
+  ["InProgress"] = fg("DiagnosticWarn"),
+}
+
+-- Return all LSP clients
+local function get_clients(opts)
+  local ret = {} ---@type lsp.Client[]
+  if vim.lsp.get_clients then
+    ret = vim.lsp.get_clients(opts)
+  else
+    ret = vim.lsp.get_active_clients(opts)
+    if opts and opts.method then
+      ---@param client lsp.Client
+      ret = vim.tbl_filter(function(client)
+        return client.supports_method(opts.method, { bufnr = opts.bufnr })
+      end, ret)
+    end
+  end
+  return opts and opts.filter and vim.tbl_filter(opts.filter, ret) or ret
+end
+
 -- [[ Configure lualine ]]
 require('lualine').setup {
   options = {
@@ -1151,6 +1130,23 @@ require('lualine').setup {
     },
   }
 }
+
+-- [[ Configure Copilot ]]
+vim.keymap.set("i", "<C-;>", 'copilot#Accept("")', {
+  expr = true,
+  replace_keycodes = false,
+  desc = "Accept Copilot suggestion",
+})
+vim.keymap.set("i", "<C-l>", "<Plug>(copilot-accept-word)", {
+  desc = "Accept the next word of the Copilot suggestion",
+})
+vim.keymap.set("i", "<C-]>", "<Plug>(copilot-next)", {
+  desc = "Cycle to the next Copilot suggestion, if one is available",
+})
+vim.keymap.set("i", "<C-[>", "<Plug>(copilot-previous)", {
+  desc = "Cycle to the previous Copilot suggestion, if one is available",
+})
+vim.g.copilot_no_tab_map = true
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
