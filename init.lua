@@ -523,6 +523,14 @@ require('lazy').setup({
   -- Replace default UIs (select, input) with nicer ones
   { 'stevearc/dressing.nvim', opts = {} },
 
+  -- Terminal
+  {
+    'akinsho/toggleterm.nvim',
+    opts = {
+      direction = 'horizontal'
+    }
+  },
+
   -- Jumping to markers
   {
     "folke/flash.nvim",
@@ -593,6 +601,22 @@ require('lazy').setup({
 vim.o.hlsearch = true
 -- Clear search with <esc>
 vim.keymap.set({ "i", "n" }, "<esc>", "<cmd>noh<cr><esc>", { desc = "Escape and clear hlsearch" })
+
+-- Configure terminal
+vim.keymap.set('n', "<c-/>", "<CMD>ToggleTerm<CR>", { desc = "Toggle terminal" })
+vim.keymap.set('t', "<c-/>", "<CMD>ToggleTerm<CR>", { desc = "Toggle terminal" })
+function _G.set_terminal_keymaps()
+  local opts = { buffer = 0 }
+  vim.keymap.set('t', '<esc>', [[<C-\><C-n>]], opts)
+  vim.keymap.set('t', 'jk', [[<C-\><C-n>]], opts)
+  vim.keymap.set('t', '<C-h>', [[<Cmd>wincmd h<CR>]], opts)
+  vim.keymap.set('t', '<C-j>', [[<Cmd>wincmd j<CR>]], opts)
+  vim.keymap.set('t', '<C-k>', [[<Cmd>wincmd k<CR>]], opts)
+  vim.keymap.set('t', '<C-l>', [[<Cmd>wincmd l<CR>]], opts)
+  vim.keymap.set('t', '<C-w>', [[<C-\><C-n><C-w>]], opts)
+end
+
+vim.cmd('autocmd! TermOpen term://*toggleterm#* lua set_terminal_keymaps()')
 
 -- Make line numbers default
 vim.wo.number = true
