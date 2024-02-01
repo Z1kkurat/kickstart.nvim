@@ -1042,41 +1042,6 @@ vim.keymap.set("n", "<leader>xl", function() require("trouble").toggle("loclist"
 vim.keymap.set("n", "gR", function() require("trouble").toggle("lsp_references") end,
   { desc = "LSP references (Trouble)" })
 
--- No idea what this does, copied from LazyVim
-local function fg(name)
-  ---@type {foreground?:number}?
-  ---@diagnostic disable-next-line: deprecated
-  local hl = vim.api.nvim_get_hl and vim.api.nvim_get_hl(0, { name = name }) or
-      vim.api.nvim_get_hl_by_name(name, true)
-  ---@diagnostic disable-next-line: undefined-field
-  local foreground = hl and (hl.fg or hl.foreground)
-  return foreground and { fg = string.format("#%06x", foreground) } or nil
-end
-
-local colors = {
-  [""] = fg("Special"),
-  ["Normal"] = fg("Special"),
-  ["Warning"] = fg("DiagnosticError"),
-  ["InProgress"] = fg("DiagnosticWarn"),
-}
-
--- Return all LSP clients
-local function get_clients(opts)
-  local ret = {} ---@type lsp.Client[]
-  if vim.lsp.get_clients then
-    ret = vim.lsp.get_clients(opts)
-  else
-    ret = vim.lsp.get_active_clients(opts)
-    if opts and opts.method then
-      ---@param client lsp.Client
-      ret = vim.tbl_filter(function(client)
-        return client.supports_method(opts.method, { bufnr = opts.bufnr })
-      end, ret)
-    end
-  end
-  return opts and opts.filter and vim.tbl_filter(opts.filter, ret) or ret
-end
-
 -- [[ Configure lualine ]]
 require('lualine').setup {
   options = {
@@ -1105,24 +1070,24 @@ require('lualine').setup {
       {
         function() return require("noice").api.status.command.get end,
         cond = function() return package.loaded["noice"] and require("noice").api.status.command.has end,
-        color = fg("Statement"),
+        color = require("util").fg("Statement"),
       },
       -- stylua: ignore
       {
         function() return require("noice").api.status.mode.get end,
         cond = function() return package.loaded["noice"] and require("noice").api.status.mode.has end,
-        color = fg("Constant"),
+        color = require("util").fg("Constant"),
       },
       -- stylua: ignore
       {
         function() return "  " .. require("dap").status() end,
         cond = function() return package.loaded["dap"] and require("dap").status() ~= "" end,
-        color = fg("Debug"),
+        color = require("util").fg("Debug"),
       },
       {
         require("lazy.status").updates,
         cond = require("lazy.status").has_updates,
-        color = fg("Special"),
+        color = require("util").fg("Special"),
       },
       {
         "diff",
