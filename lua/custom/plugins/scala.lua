@@ -23,64 +23,64 @@ return {
     "scalameta/nvim-metals",
     dependencies = {
       "nvim-lua/plenary.nvim",
-      {
-        "mfussenegger/nvim-dap",
-        config = function(self, opts)
-          local map = vim.keymap.set
-          -- Debug settings if you're using nvim-dap
-          local dap = require("dap")
-
-          -- Example mappings for usage with nvim-dap. If you don't use that, you can
-          -- skip these
-          -- map("n", "<leader>dc", function()
-          --   require("dap").continue()
-          -- end, { desc = "[d]ap continue" })
-          --
-          -- map("n", "<leader>dr", function()
-          --   require("dap").repl.toggle()
-          -- end, { desc = "[d]ap [r]epl toggle" })
-          --
-          -- map("n", "<leader>dK", function()
-          --   require("dap.ui.widgets").hover()
-          -- end, { desc = "[d]ap UI widgets" })
-          --
-          -- map("n", "<leader>dt", function()
-          --   require("dap").toggle_breakpoint()
-          -- end, { desc = "[d]ap [t]oggle breakpoint" })
-          --
-          -- map("n", "<leader>dso", function()
-          --   require("dap").step_over()
-          -- end, { desc = "[d]ap [s]tep [o]ver" })
-          --
-          -- map("n", "<leader>dsi", function()
-          --   require("dap").step_into()
-          -- end, { desc = "[d]ap [s]tep [i]nto" })
-          --
-          -- map("n", "<leader>dl", function()
-          --   require("dap").run_last()
-          -- end, { desc = "[d]ap run [l]ast" })
-          --
-          dap.configurations.scala = {
-            {
-              type = "scala",
-              request = "launch",
-              name = "RunOrTest",
-              metals = {
-                runType = "runOrTestFile",
-                --args = { "firstArg", "secondArg", "thirdArg" }, -- here just as an example
-              },
-            },
-            {
-              type = "scala",
-              request = "launch",
-              name = "Test Target",
-              metals = {
-                runType = "testTarget",
-              },
-            },
-          }
-        end
-      }
+      -- {
+      --   "mfussenegger/nvim-dap",
+      --   config = function(self, opts)
+      --     local map = vim.keymap.set
+      --     -- Debug settings if you're using nvim-dap
+      --     local dap = require("dap")
+      --
+      --     -- Example mappings for usage with nvim-dap. If you don't use that, you can
+      --     -- skip these
+      --     -- map("n", "<leader>dc", function()
+      --     --   require("dap").continue()
+      --     -- end, { desc = "[d]ap continue" })
+      --     --
+      --     -- map("n", "<leader>dr", function()
+      --     --   require("dap").repl.toggle()
+      --     -- end, { desc = "[d]ap [r]epl toggle" })
+      --     --
+      --     -- map("n", "<leader>dK", function()
+      --     --   require("dap.ui.widgets").hover()
+      --     -- end, { desc = "[d]ap UI widgets" })
+      --     --
+      --     -- map("n", "<leader>dt", function()
+      --     --   require("dap").toggle_breakpoint()
+      --     -- end, { desc = "[d]ap [t]oggle breakpoint" })
+      --     --
+      --     -- map("n", "<leader>dso", function()
+      --     --   require("dap").step_over()
+      --     -- end, { desc = "[d]ap [s]tep [o]ver" })
+      --     --
+      --     -- map("n", "<leader>dsi", function()
+      --     --   require("dap").step_into()
+      --     -- end, { desc = "[d]ap [s]tep [i]nto" })
+      --     --
+      --     -- map("n", "<leader>dl", function()
+      --     --   require("dap").run_last()
+      --     -- end, { desc = "[d]ap run [l]ast" })
+      --     --
+      --     dap.configurations.scala = {
+      --       {
+      --         type = "scala",
+      --         request = "launch",
+      --         name = "RunOrTest",
+      --         metals = {
+      --           runType = "runOrTestFile",
+      --           --args = { "firstArg", "secondArg", "thirdArg" }, -- here just as an example
+      --         },
+      --       },
+      --       {
+      --         type = "scala",
+      --         request = "launch",
+      --         name = "Test Target",
+      --         metals = {
+      --           runType = "testTarget",
+      --         },
+      --       },
+      --     }
+      --   end
+      -- }
     },
     config = function()
       local metals_config = require("metals").bare_config()
