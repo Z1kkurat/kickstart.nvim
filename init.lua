@@ -115,6 +115,24 @@ require('lazy').setup({
     },
   },
 
+  -- Better LSP UI
+  -- {
+  --   'nvimdev/lspsaga.nvim',
+  --   after = 'nvim-lspconfig',
+  --   config = function()
+  --     require('lspsaga').setup({
+  --       lightbulb = {
+  --         enable = false,
+  --       },
+  --     })
+  --     vim.keymap.set('n', 'gh', '<cmd>Lspsaga finder ++normal<cr>', { desc = 'LSP Finder (Saga)' })
+  --   end,
+  --   dependencies = {
+  --     'nvim-treesitter/nvim-treesitter',
+  --     'nvim-tree/nvim-web-devicons'
+  --   },
+  -- },
+
   {
     -- Autocompletion
     'hrsh7th/nvim-cmp',
