@@ -244,8 +244,14 @@ require('lazy').setup({
     -- Theme inspired by Atom
     'navarasu/onedark.nvim',
     priority = 1000,
+    lazy = false,
     config = function()
-      vim.cmd.colorscheme 'onedark'
+      require('onedark').setup {
+        -- Set a style preset. 'dark' is default.
+        style = 'warmer', -- dark, darker, cool, deep, warm, warmer, light
+      }
+      require('onedark').load()
+      -- vim.cmd.colorscheme 'onedark'
     end,
   },
 
@@ -940,7 +946,9 @@ local on_attach = function(_, bufnr)
   end
 
   nmap('<leader>cr', vim.lsp.buf.rename, '[C]ode [Rename]')
-  nmap('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
+  nmap('<leader>ca', function()
+    vim.lsp.buf.code_action { context = { only = { 'quickfix', 'refactor', 'source' } } }
+  end, '[C]ode [A]ction')
   nmap("<leader>cs", vim.lsp.codelens.run, "Run [c]ode len[s]")
 
   nmap('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
