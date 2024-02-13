@@ -116,22 +116,35 @@ require('lazy').setup({
   },
 
   -- Better LSP UI
-  -- {
-  --   'nvimdev/lspsaga.nvim',
-  --   after = 'nvim-lspconfig',
-  --   config = function()
-  --     require('lspsaga').setup({
-  --       lightbulb = {
-  --         enable = false,
-  --       },
-  --     })
-  --     vim.keymap.set('n', 'gh', '<cmd>Lspsaga finder ++normal<cr>', { desc = 'LSP Finder (Saga)' })
-  --   end,
-  --   dependencies = {
-  --     'nvim-treesitter/nvim-treesitter',
-  --     'nvim-tree/nvim-web-devicons'
-  --   },
-  -- },
+  {
+    'nvimdev/lspsaga.nvim',
+    after = 'nvim-lspconfig',
+    config = function()
+      require('lspsaga').setup({
+        lightbulb = {
+          enable = false,
+        },
+      })
+      vim.keymap.set('n', 'gh', '<cmd>Lspsaga finder ++normal<cr>', { desc = 'LSP Finder (Saga)' })
+    end,
+    dependencies = {
+      'nvim-treesitter/nvim-treesitter',
+      'nvim-tree/nvim-web-devicons'
+    },
+  },
+
+  -- Better buffer split management
+  {
+    'mrjones2014/smart-splits.nvim',
+    config = function()
+      local splits = require('smart-splits')
+      splits.setup({})
+      vim.keymap.set('n', '<M-h>', splits.resize_left)
+      vim.keymap.set('n', '<M-j>', splits.resize_down)
+      vim.keymap.set('n', '<M-k>', splits.resize_up)
+      vim.keymap.set('n', '<M-l>', splits.resize_right)
+    end,
+  },
 
   {
     -- Autocompletion
@@ -729,6 +742,8 @@ require('telescope').setup {
     -- Long Scala packages make me sad
     lsp_references = {
       layout_strategy = "vertical",
+      -- https://github.com/nvim-telescope/telescope.nvim/issues/2121#issuecomment-1211196978
+      show_line = false,
     },
   }
 }
@@ -899,6 +914,13 @@ vim.defer_fn(function()
     max_lines = 3,
   })
 end, 0)
+
+-- Ensure Hocon files are recognized as hocon for syntax highlighting
+local hocon_group = vim.api.nvim_create_augroup("hocon", { clear = true })
+vim.api.nvim_create_autocmd(
+  { 'BufNewFile', 'BufRead' },
+  { group = hocon_group, pattern = '*/resources/*.conf', command = 'set ft=hocon' }
+)
 
 -- [[ Configure LSP ]]
 --  This function gets run when an LSP connects to a particular buffer.
