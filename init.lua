@@ -530,7 +530,11 @@ require('lazy').setup({
         { text = icons.diagnostics.Info, texthl = "DiagnosticSignInfo" })
       vim.fn.sign_define("DiagnosticSignHint",
         { text = icons.diagnostics.Hint, texthl = "DiagnosticSignHint" })
-      require("neo-tree").setup({
+      local events = require("neo-tree.events")
+      local function on_move(data)
+        require('util').lsp_on_rename(data.source, data.destination)
+      end
+      local opts = {
         sources = { "filesystem", "buffers", "git_status", "document_symbols" },
         open_files_do_not_replace_types = { "terminal", "Trouble", "trouble", "qf", "Outline" },
         filesystem = {
@@ -556,7 +560,12 @@ require('lazy').setup({
             expander_highlight = "NeoTreeExpander",
           },
         },
-      })
+        event_handlers = {
+          { event = events.FILE_MOVED,   handler = on_move },
+          { event = events.FILE_RENAMED, handler = on_move },
+        },
+      }
+      require("neo-tree").setup(opts)
     end,
   },
 
@@ -751,6 +760,10 @@ require('telescope').setup {
       -- https://github.com/nvim-telescope/telescope.nvim/issues/2121#issuecomment-1211196978
       show_line = false,
     },
+    lsp_implementations = {
+      layout_strategy = "vertical",
+      show_line = false,
+    },
   }
 }
 
@@ -815,7 +828,7 @@ vim.api.nvim_create_user_command('LiveGrepGitRoot', live_grep_git_root, {})
 
 -- See `:help telescope.builtin`
 vim.keymap.set('n', '<leader>?', require('telescope.builtin').oldfiles, { desc = '[?] Find recently opened files' })
-vim.keymap.set('n', '<leader>b', require('telescope.builtin').buffers, { desc = 'Find existing [b]uffers' })
+vim.keymap.set('n', '<leader>bf', require('telescope.builtin').buffers, { desc = 'Find existing buffers' })
 vim.keymap.set('n', '<leader>/', function()
   -- You can pass additional configuration to telescope to change theme, layout, etc.
   require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
@@ -980,6 +993,7 @@ end
 -- document existing key chains
 require('which-key').register {
   ['<leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
+  ['<leader>b'] = { name = '[B]uffer', _ = 'which_key_ignore' },
   ['<leader>d'] = { name = '[D]ebug', _ = 'which_key_ignore' },
   ['<leader>g'] = { name = '[G]it', _ = 'which_key_ignore' },
   ['<leader>h'] = { name = 'Git [H]unk', _ = 'which_key_ignore' },
