@@ -764,6 +764,9 @@ require('telescope').setup {
       layout_strategy = "vertical",
       show_line = false,
     },
+    lsp_dynamic_workspace_symbols = {
+      fname_width = 100,
+    },
   }
 }
 
