@@ -108,7 +108,7 @@ require('lazy').setup({
 
       -- Useful status updates for LSP
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-      { 'j-hui/fidget.nvim',       opts = {} },
+      -- { 'j-hui/fidget.nvim',       opts = {} },
 
       -- Additional lua configuration, makes nvim stuff amazing!
       'folke/neodev.nvim',
@@ -298,7 +298,19 @@ require('lazy').setup({
           ["cmp.entry.get_documentation"] = true,
         },
       },
+      status = {
+        -- Statusline component for LSP progress notifications.
+        lsp_progress = { event = 'lsp', kind = 'progress' },
+      },
       routes = {
+        -- Don't show these in the default view.
+        {
+          filter = {
+            event = 'lsp',
+            kind = 'progress',
+          },
+          opts = { skip = true },
+        },
         {
           filter = {
             event = "msg_show",
@@ -1167,7 +1179,15 @@ require('lualine').setup {
       { "filename", path = 1 },
     },
     lualine_x = {
-      { 'g:metals_status' },
+      -- { 'g:metals_status' },
+      {
+        function()
+          return require('noice').api.status.lsp_progress.get_hl()
+        end,
+        cond = function()
+          return package.loaded['noice'] and require('noice').api.status.lsp_progress.has()
+        end,
+      },
       {
         function() return require("noice").api.status.command.get end,
         cond = function() return package.loaded["noice"] and require("noice").api.status.command.has end,
@@ -1220,6 +1240,12 @@ require('lualine').setup {
     },
   }
 }
+
+-- Update the statusline with the latest LSP message.
+vim.api.nvim_create_autocmd('LspProgress', {
+  pattern = '*',
+  command = 'redrawstatus',
+})
 
 -- windows
 vim.keymap.set("n", "<leader>ww", "<C-W>p", { desc = "Other window", remap = true })
