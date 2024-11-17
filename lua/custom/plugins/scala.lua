@@ -87,6 +87,16 @@ return {
       local map = vim.keymap.set
       metals_config.settings = {
         showImplicitArguments = true,
+        inlayHints = {
+          hintsInPatternMatch = { enable = true },
+          implicitArguments = { enable = true },
+          -- implicitConversions = { enable = true },
+          inferredTypes = { enable = true },
+          typeParameters = { enable = true },
+        },
+        serverProperties = {
+          "-Dmetals.enable-best-effort=true"
+        },
         -- excludedPackages = { "akka.actor.typed.javadsl", "com.github.swagger.akka.javadsl" },
       }
       metals_config.init_options.statusBarProvider = "on"

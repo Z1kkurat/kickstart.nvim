@@ -26,6 +26,7 @@ return {
       mappings = nil,
       callbacks = {
         ["gitlab.evolution.com"] = require "gitlinker.hosts".get_gitlab_type_url
+        -- ["gitlab.evolutiongaming.com"] = require "gitlinker.hosts".get_gitlab_type_url
       }
     })
   end,

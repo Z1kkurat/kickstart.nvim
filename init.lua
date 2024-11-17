@@ -111,8 +111,25 @@ require('lazy').setup({
       -- { 'j-hui/fidget.nvim',       opts = {} },
 
       -- Additional lua configuration, makes nvim stuff amazing!
-      'folke/neodev.nvim',
+      {
+        "folke/lazydev.nvim",
+        ft = "lua", -- only load on lua files
+        opts = {
+          library = {
+            -- Library items can be absolute paths
+            -- "~/projects/my-awesome-lib",
+            -- Or relative, which means they will be resolved as a plugin
+            -- "LazyVim",
+            -- When relative, you can also provide a path to the library in the plugin dir
+            "luvit-meta/library", -- see below
+          },
+        },
+      },
+      { "Bilal2453/luvit-meta",    lazy = true }, -- optional `vim.uv` typings
     },
+    -- opts = {
+    --   inlay_hints = { enabled = true },
+    -- },
   },
 
   -- Better LSP UI
@@ -290,6 +307,9 @@ require('lazy').setup({
   {
     "folke/noice.nvim",
     event = "VeryLazy",
+    dependencies = {
+      { "MunifTanjim/nui.nvim" },
+    },
     opts = {
       lsp = {
         override = {
@@ -366,7 +386,7 @@ require('lazy').setup({
           "help",
           "alpha",
           "dashboard",
-          "neo-tree",
+          -- "neo-tree",
           "Trouble",
           "trouble",
           "lazy",
@@ -394,7 +414,7 @@ require('lazy').setup({
           "help",
           "alpha",
           "dashboard",
-          "neo-tree",
+          -- "neo-tree",
           "Trouble",
           "trouble",
           "lazy",
@@ -411,10 +431,13 @@ require('lazy').setup({
   },
 
   -- "gc" to comment visual regions/lines
-  { 'numToStr/Comment.nvim',  opts = {} },
+  { 'numToStr/Comment.nvim',     opts = {} },
 
   -- Autoclose brackets
-  { 'echasnovski/mini.pairs', opts = {} },
+  { 'echasnovski/mini.pairs',    opts = {} },
+
+  -- Surround text objects
+  { 'echasnovski/mini.surround', opts = {} },
 
   -- Close buffers conveniently
   {
@@ -475,12 +498,12 @@ require('lazy').setup({
           return vim.trim(ret)
         end,
         offsets = {
-          {
-            filetype = "neo-tree",
-            text = "Neo-tree",
-            highlight = "Directory",
-            text_align = "left",
-          },
+          -- {
+          --   filetype = "neo-tree",
+          --   text = "Neo-tree",
+          --   highlight = "Directory",
+          --   text_align = "left",
+          -- },
         },
       },
     },
@@ -497,89 +520,89 @@ require('lazy').setup({
     end,
   },
 
-  -- File tree
-  {
-    "nvim-neo-tree/neo-tree.nvim",
-    branch = "v3.x",
-    dependencies = {
-      { "MunifTanjim/nui.nvim" },
-    },
-    cmd = "Neotree",
-    keys = {
-      {
-        "<leader>e",
-        function()
-          require("neo-tree.command").execute({ toggle = true, dir = vim.loop.cwd() })
-        end,
-        desc = "Explorer NeoTree (cwd)",
-      },
-      {
-        "<leader>ge",
-        function()
-          require("neo-tree.command").execute({ source = "git_status", toggle = true })
-        end,
-        desc = "Git explorer",
-      },
-    },
-    deactivate = function()
-      vim.cmd([[Neotree close]])
-    end,
-    init = function()
-      if vim.fn.argc(-1) == 1 then
-        local stat = vim.loop.fs_stat(vim.fn.argv(0))
-        if stat and stat.type == "directory" then
-          require("neo-tree")
-        end
-      end
-    end,
-    opts = {},
-    config = function()
-      vim.fn.sign_define("DiagnosticSignError",
-        { text = icons.diagnostics.Error, texthl = "DiagnosticSignError" })
-      vim.fn.sign_define("DiagnosticSignWarn",
-        { text = icons.diagnostics.Warn, texthl = "DiagnosticSignWarn" })
-      vim.fn.sign_define("DiagnosticSignInfo",
-        { text = icons.diagnostics.Info, texthl = "DiagnosticSignInfo" })
-      vim.fn.sign_define("DiagnosticSignHint",
-        { text = icons.diagnostics.Hint, texthl = "DiagnosticSignHint" })
-      local events = require("neo-tree.events")
-      local function on_move(data)
-        require('util').lsp_on_rename(data.source, data.destination)
-      end
-      local opts = {
-        sources = { "filesystem", "buffers", "git_status", "document_symbols" },
-        open_files_do_not_replace_types = { "terminal", "Trouble", "trouble", "qf", "Outline" },
-        filesystem = {
-          bind_to_cwd = false,
-          follow_current_file = { enabled = true },
-          use_libuv_file_watcher = true,
-        },
-        window = {
-          mappings = {
-            ["<space>"] = "none",
-            ["Y"] = function(state)
-              local node = state.tree:get_node()
-              local path = node:get_id()
-              vim.fn.setreg("+", path, "c")
-            end,
-          },
-        },
-        default_component_configs = {
-          indent = {
-            with_expanders = true, -- if nil and file nesting is enabled, will enable expanders
-            expander_collapsed = "",
-            expander_expanded = "",
-            expander_highlight = "NeoTreeExpander",
-          },
-        },
-        event_handlers = {
-          { event = events.FILE_MOVED,   handler = on_move },
-          { event = events.FILE_RENAMED, handler = on_move },
-        },
-      }
-      require("neo-tree").setup(opts)
-    end,
-  },
+  -- -- File tree
+  -- {
+  --   "nvim-neo-tree/neo-tree.nvim",
+  --   branch = "v3.x",
+  --   dependencies = {
+  --     { "MunifTanjim/nui.nvim" },
+  --   },
+  --   cmd = "Neotree",
+  --   keys = {
+  --     {
+  --       "<leader>e",
+  --       function()
+  --         require("neo-tree.command").execute({ toggle = true, dir = vim.loop.cwd() })
+  --       end,
+  --       desc = "Explorer NeoTree (cwd)",
+  --     },
+  --     {
+  --       "<leader>ge",
+  --       function()
+  --         require("neo-tree.command").execute({ source = "git_status", toggle = true })
+  --       end,
+  --       desc = "Git explorer",
+  --     },
+  --   },
+  --   deactivate = function()
+  --     vim.cmd([[Neotree close]])
+  --   end,
+  --   init = function()
+  --     if vim.fn.argc(-1) == 1 then
+  --       local stat = vim.loop.fs_stat(vim.fn.argv(0))
+  --       if stat and stat.type == "directory" then
+  --         require("neo-tree")
+  --       end
+  --     end
+  --   end,
+  --   opts = {},
+  --   config = function()
+  --     vim.fn.sign_define("DiagnosticSignError",
+  --       { text = icons.diagnostics.Error, texthl = "DiagnosticSignError" })
+  --     vim.fn.sign_define("DiagnosticSignWarn",
+  --       { text = icons.diagnostics.Warn, texthl = "DiagnosticSignWarn" })
+  --     vim.fn.sign_define("DiagnosticSignInfo",
+  --       { text = icons.diagnostics.Info, texthl = "DiagnosticSignInfo" })
+  --     vim.fn.sign_define("DiagnosticSignHint",
+  --       { text = icons.diagnostics.Hint, texthl = "DiagnosticSignHint" })
+  --     local events = require("neo-tree.events")
+  --     local function on_move(data)
+  --       require('util').lsp_on_rename(data.source, data.destination)
+  --     end
+  --     local opts = {
+  --       sources = { "filesystem", "buffers", "git_status", "document_symbols" },
+  --       open_files_do_not_replace_types = { "terminal", "Trouble", "trouble", "qf", "Outline" },
+  --       filesystem = {
+  --         bind_to_cwd = false,
+  --         follow_current_file = { enabled = true },
+  --         use_libuv_file_watcher = true,
+  --       },
+  --       window = {
+  --         mappings = {
+  --           ["<space>"] = "none",
+  --           ["Y"] = function(state)
+  --             local node = state.tree:get_node()
+  --             local path = node:get_id()
+  --             vim.fn.setreg("+", path, "c")
+  --           end,
+  --         },
+  --       },
+  --       default_component_configs = {
+  --         indent = {
+  --           with_expanders = true, -- if nil and file nesting is enabled, will enable expanders
+  --           expander_collapsed = "",
+  --           expander_expanded = "",
+  --           expander_highlight = "NeoTreeExpander",
+  --         },
+  --       },
+  --       event_handlers = {
+  --         { event = events.FILE_MOVED,   handler = on_move },
+  --         { event = events.FILE_RENAMED, handler = on_move },
+  --       },
+  --     }
+  --     require("neo-tree").setup(opts)
+  --   end,
+  -- },
 
   -- Replace default UIs (select, input) with nicer ones
   { 'stevearc/dressing.nvim', opts = {} },
@@ -601,7 +624,7 @@ require('lazy').setup({
     opts = {},
     -- stylua: ignore
     keys = {
-      { "s",     mode = { "n", "x", "o" }, function() require("flash").jump() end,              desc = "Flash" },
+      { "q",     mode = { "n", "x", "o" }, function() require("flash").jump() end,              desc = "Flash" },
       { "S",     mode = { "n", "o", "x" }, function() require("flash").treesitter() end,        desc = "Flash Treesitter" },
       { "r",     mode = "o",               function() require("flash").remote() end,            desc = "Remote Flash" },
       { "R",     mode = { "o", "x" },      function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
@@ -978,6 +1001,11 @@ local on_attach = function(_, bufnr)
     vim.lsp.buf.code_action { context = { only = { 'quickfix', 'refactor', 'source' } } }
   end, '[C]ode [A]ction')
   nmap("<leader>cs", vim.lsp.codelens.run, "Run [c]ode len[s]")
+  -- enable/disable inlay hints (should also be enabled in the LSP server settings)
+  nmap('<leader>ci', function()
+      vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ 0 }), { 0 })
+    end,
+    'Toggle [C]ode [I]nlay hints')
 
   nmap('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
   nmap('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
@@ -988,7 +1016,7 @@ local on_attach = function(_, bufnr)
 
   -- See `:help K` for why this keymap
   nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
-  vim.keymap.set('i', "<c-k>", vim.lsp.buf.signature_help, { desc = "Signature Help" })
+  vim.keymap.set('i', "<C-k>", vim.lsp.buf.signature_help, { desc = "Signature Help" })
   -- nmap('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
 
   -- Lesser used LSP functionality
@@ -998,6 +1026,7 @@ local on_attach = function(_, bufnr)
   -- nmap('<leader>wl', function()
   --   print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
   -- end, '[W]orkspace [L]ist Folders')
+  --
 
   -- Create a command `:Format` local to the LSP buffer
   vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
@@ -1006,23 +1035,33 @@ local on_attach = function(_, bufnr)
 end
 
 -- document existing key chains
-require('which-key').register {
-  ['<leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
-  ['<leader>b'] = { name = '[B]uffer', _ = 'which_key_ignore' },
-  ['<leader>d'] = { name = '[D]ebug', _ = 'which_key_ignore' },
-  ['<leader>g'] = { name = '[G]it', _ = 'which_key_ignore' },
-  ['<leader>h'] = { name = 'Git [H]unk', _ = 'which_key_ignore' },
-  ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
-  ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
-  ['<leader>t'] = { name = '[T]oggle', _ = 'which_key_ignore' },
-  ['<leader>w'] = { name = '[W]indow', _ = 'which_key_ignore' },
-  ['<leader>n'] = { name = '[N]oice', _ = 'which_key_ignore' },
+require('which-key').add {
+  { "<leader>b",  group = "[B]uffer" },
+  { "<leader>b_", hidden = true },
+  { "<leader>c",  group = "[C]ode" },
+  { "<leader>c_", hidden = true },
+  { "<leader>d",  group = "[D]ebug" },
+  { "<leader>d_", hidden = true },
+  { "<leader>g",  group = "[G]it" },
+  { "<leader>g_", hidden = true },
+  { "<leader>h",  group = "Git [H]unk" },
+  { "<leader>h_", hidden = true },
+  { "<leader>n",  group = "[N]oice" },
+  { "<leader>n_", hidden = true },
+  { "<leader>r",  group = "[R]ename" },
+  { "<leader>r_", hidden = true },
+  { "<leader>s",  group = "[S]earch" },
+  { "<leader>s_", hidden = true },
+  { "<leader>t",  group = "[T]oggle" },
+  { "<leader>t_", hidden = true },
+  { "<leader>w",  group = "[W]indow" },
+  { "<leader>w_", hidden = true },
 }
 -- register which-key VISUAL mode
 -- required for visual <leader>hs (hunk stage) to work
-require('which-key').register({
-  ['<leader>'] = { name = 'VISUAL <leader>' },
-  ['<leader>h'] = { 'Git [H]unk' },
+require('which-key').add({
+  { "<leader>",  group = "VISUAL <leader>", mode = "v" },
+  { "<leader>h", desc = "Git [H]unk",       mode = "v" },
 }, { mode = 'v' })
 
 -- mason-lspconfig requires that these setup functions are called in this order
@@ -1055,9 +1094,6 @@ local servers = {
     },
   },
 }
-
--- Setup neovim lua configuration
-require('neodev').setup()
 
 -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
 local capabilities = vim.lsp.protocol.make_client_capabilities()
@@ -1139,16 +1175,15 @@ cmp.setup {
   sources = {
     { name = 'nvim_lsp' },
     { name = 'luasnip' },
+    { name = 'lazydev' },
     { name = 'path' },
   },
 }
 
 -- [[ Configure Trouble.nvim ]]
 vim.keymap.set("n", "<leader>xx", function() require("trouble").toggle() end, { desc = "Toggle trouble" })
-vim.keymap.set("n", "<leader>xw", function() require("trouble").toggle("workspace_diagnostics") end,
-  { desc = "Workspace diagnostics (Trouble)" })
-vim.keymap.set("n", "<leader>xd", function() require("trouble").toggle("document_diagnostics") end,
-  { desc = "Document diagnostics (Trouble)" })
+vim.keymap.set("n", "<leader>xw", function() require("trouble").toggle("diagnostics") end,
+  { desc = "Diagnostics (Trouble)" })
 vim.keymap.set("n", "<leader>xq", function() require("trouble").toggle("quickfix") end, { desc = "Quickfix (Trouble)" })
 vim.keymap.set("n", "<leader>xl", function() require("trouble").toggle("loclist") end,
   { desc = "Location list (Trouble)" })
