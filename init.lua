@@ -652,6 +652,10 @@ require('lazy').setup({
       },
     },
   },
+  {
+    "nvim-telescope/telescope-file-browser.nvim",
+    dependencies = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" }
+  },
 
   {
     -- Highlight, edit, and navigate code
@@ -802,11 +806,23 @@ require('telescope').setup {
     lsp_dynamic_workspace_symbols = {
       fname_width = 100,
     },
+    file_browser = {
+      layout_strategy = "horizontal",
+    },
+  },
+  extension = {
+    file_browser = {
+      theme = "ivy",
+      hijack_netrw = true,
+    }
   }
 }
 
+vim.keymap.set("n", "<space>fb", ":Telescope file_browser path=%:p:h select_buffer=true<CR>")
+
 -- Enable telescope fzf native, if installed
 pcall(require('telescope').load_extension, 'fzf')
+require('telescope').load_extension('file_browser')
 
 -- Telescope live_grep in git root
 -- Function to find the git root directory based on the current buffer's path
